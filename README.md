@@ -1,4 +1,4 @@
-# koa-stream
+# koa-stream [![Build Status](https://travis-ci.org/claudetech/koa-stream.svg?branch=master)](https://travis-ci.org/claudetech/koa-stream) [![Coverage Status](https://coveralls.io/repos/claudetech/koa-stream/badge.svg)](https://coveralls.io/r/claudetech/koa-stream)
 
 Helper to stream file with range requests using koa.
 This can be used with `video` tags, and other resource using the `Range` header.
@@ -23,7 +23,7 @@ app.use(function *() {
 });
 ```
 
-An example is provided in [the sample directory](./sample).
+See [sample/index.js](./sample/index.js) for a working example.
 
 ### Options
 
