@@ -14,7 +14,7 @@ const makeRequest = function (filepath, options) {
   let req = request(app.listen())
     .get('/');
   if (options.range) {
-    req.set('Range', `bytes=${options.range.start}-${options.range.end}`);
+    req.set('Range', 'bytes=' + options.range.start + '-' + options.range.end);
   }
   return req;
 };
