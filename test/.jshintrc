@@ -1,0 +1,6 @@
+{
+  "extends": "../.jshintrc",
+  "expr": true,
+  "mocha": true,
+  "maxstatements": 20
+}

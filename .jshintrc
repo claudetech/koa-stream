@@ -1,0 +1,20 @@
+{
+  "strict": true,
+  "esnext": true,
+  "noyield": true,
+  "unused": true,
+  "undef": true,
+  "curly": true,
+  "forin": true,
+  "freeze": true,
+  "futurehostile": true,
+  "latedef": true,
+  "maxdepth": 2,
+  "maxparams": 4,
+  "maxstatements": 10,
+  "noarg": true,
+  "nocomma": true,
+  "nonew": true,
+  "node": true,
+  "predef": ["$"]
+}
