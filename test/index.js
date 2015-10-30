@@ -3,13 +3,13 @@
 const request = require('supertest');
 const koa     = require('koa');
 
-const stream = require('..');
+const streamFile = require('..').streamFile;
 
 const makeRequest = function (filepath, options) {
   let app = koa();
   options = options || {};
   app.use(function *() {
-    yield stream(this, filepath, options);
+    yield streamFile(this, filepath, options);
   });
   let req = request(app.listen())
     .get('/');
@@ -19,7 +19,7 @@ const makeRequest = function (filepath, options) {
   return req;
 };
 
-describe('stream(ctx, file)', function () {
+describe('streamFile(ctx, file)', function () {
   context('with no root', function () {
     context('with absolute path', function () {
       it('should return 404', function (done) {
