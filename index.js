@@ -25,6 +25,8 @@ const parseRange = function (range, totalLength) {
     result.start = 0;
   }
 
+  result.totalLength = totalLength;
+
   return result;
 };
 
@@ -41,14 +43,26 @@ const sendFile = function (ctx, filepath, size) {
   ctx.body = fs.createReadStream(filepath);
 };
 
-const streamFile = function (ctx, range, filepath, stat) {
-  ctx.set('Content-Range', 'bytes ' + range.start + '-' + range.end + '/' + stat.size);
+const sendBufferAtOnce = function (ctx, buffer, type) {
+  ctx.set('Content-Type', type);
+  ctx.set('Content-Length', buffer.length);
+  ctx.body = buffer;
+};
+
+const streamRange = function (ctx, body, range, contentType) {
+  ctx.set('Content-Range', 'bytes ' + range.start + '-' + range.end + '/' + range.totalLength);
   ctx.set('Content-Length', range.end - range.start + 1);
-  ctx.set('Content-Type', mime.lookup(filepath));
+  ctx.set('Content-Type', contentType);
   ctx.set('Accept-Ranges', 'bytes');
   ctx.set('Cache-Control', 'no-cache');
   ctx.status = 206;
-  ctx.body = fs.createReadStream(filepath, {start: range.start, end: range.end});
+  ctx.body = body;
+};
+
+const handleFileStream = function (ctx, range, filepath) {
+  let stream = fs.createReadStream(filepath, {start: range.start, end: range.end});
+  let contentType = mime.lookup(filepath);
+  streamRange(ctx, stream, range, contentType);
 };
 
 const getFileStat = function *(filepath) {
@@ -84,7 +98,22 @@ const handleRequest = function *(ctx, filepath, options) {
     return endRequest(ctx, stat.size);
   }
 
-  streamFile(ctx, range, filepath, stat);
+  handleFileStream(ctx, range, filepath, stat);
+};
+
+const handleBuffer = function (ctx, buffer, contentType, options) {
+  let range = parseRange(ctx.headers.range, buffer.length);
+
+  if (range === null) {
+    return options.allowDownload ? sendBufferAtOnce(ctx, buffer, contentType) : null;
+  }
+
+  if (range.start >= buffer.length || range.end >= buffer.length) {
+    return endRequest(ctx, buffer.length);
+  }
+
+  let bufferSlice = buffer.slice(range.start, range.end);
+  streamRange(ctx, bufferSlice, range, contentType);
 };
 
 const decode = function (filepath) {
@@ -95,7 +124,7 @@ const decode = function (filepath) {
   }
 };
 
-const stream = function (ctx, filepath, options) {
+const streamFile = function (ctx, filepath, options) {
   assert(ctx, 'koa context required');
   assert(filepath, 'filepath required');
   options = options || {};
@@ -109,4 +138,14 @@ const stream = function (ctx, filepath, options) {
   return handleRequest(ctx, filepath, options);
 };
 
-module.exports = stream;
+const streamBuffer = function (ctx, buffer, contentType, options) {
+  assert(ctx, 'koa context required');
+  assert(buffer instanceof Buffer, 'buffer required');
+  options = options || {};
+  return handleBuffer(ctx, buffer, contentType, options);
+};
+
+module.exports = {
+	file: streamFile,
+	buffer: streamBuffer
+};
