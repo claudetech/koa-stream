@@ -3,17 +3,18 @@
 const request = require('supertest');
 const koa     = require('koa');
 
-const streamFile = require('..').streamFile;
-const streamBuffer = require('..').streamBuffer;
+const stream = require('..');
 
 const testBuffer = new Buffer([1,2,3,4,5]);
 
 const makeRequest = function (filepath, options) {
   let app = koa();
   options = options || {};
+
   app.use(function *() {
-    yield streamFile(this, filepath, options);
+    yield stream.file(this, filepath, options);
   });
+
   let req = request(app.listen())
     .get('/');
   if (options.range) {
@@ -29,7 +30,7 @@ const makeRequestForBuffer = function (options) {
   let contentType = 'application/octet-stream';
 
   app.use(function *() {
-    streamBuffer(this, testBuffer, contentType, options);
+    stream.buffer(this, testBuffer, contentType, options);
   });
 
   let req = request(app.listen())

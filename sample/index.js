@@ -1,13 +1,13 @@
 'use strict';
 
 const koa    = require('koa');
-const stream = require('..').streamFile;
+const stream = require('..');
 
 let app = koa();
 
 app.use(function *() {
   if (this.path === '/video') {
-    yield stream(this, 'sample_video.mp4', {root: '/tmp/videos'});
+    yield stream.file(this, 'sample_video.mp4', {root: '/tmp/videos'});
   } else {
     this.body = '<video src="http://localhost:3000/video" controls autoplay>';
   }

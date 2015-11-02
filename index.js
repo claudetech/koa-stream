@@ -146,6 +146,6 @@ const streamBuffer = function (ctx, buffer, contentType, options) {
 };
 
 module.exports = {
-	streamFile: streamFile,
-	streamBuffer: streamBuffer
+	file: streamFile,
+	buffer: streamBuffer
 };
